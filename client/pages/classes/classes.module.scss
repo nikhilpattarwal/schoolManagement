@@ -1,0 +1,119 @@
+
+.mainCont{
+    padding:1rem;
+    .searchBar{
+        height:3vh;
+    }
+    .mainData{
+        margin-top: 2rem;
+        .selectClass{
+            h3{
+                color: rgb(24, 8, 248);
+            }
+            select {
+                outline: none;
+                border: 1px solid hsl(0, 0%, 100%);
+                padding:2px;
+                font-size: 14px;
+                cursor: pointer;
+              }
+              
+              select::after {
+                content: '\25BC'; 
+                position: absolute;
+                top: 50%;
+                right: 10px;
+                transform: translateY(-50%);
+              }
+        }
+        .mainContent{
+            margin: 1.3rem;
+            gap: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            .wrapper{
+                display: flex;
+                gap: 1rem;
+                background-color: aqua;
+                height: 3rem;
+                align-items: center;
+                width: 22rem;
+                justify-content: center;
+                border-radius: 1rem;
+                padding: .2rem;
+                text-wrap: nowrap;
+                .name{
+
+                    span{
+                        font-size: 1rem;
+                        font-weight: bold;
+                        color: rgb(48, 26, 172);
+                    }
+                }
+                .classname{
+                    span{
+                        font-size: 1rem;
+                        font-weight: bold;
+                        color: rgb(26, 172, 33);
+                    }
+                }
+                .delIcon{
+                    color: red;
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+}
+
+
+.class1{
+    height: 20vh;
+    img{
+        display: none;
+    }   
+    .class2{
+        margin-top: 5rem;
+        display: flex;
+        justify-content: center;
+        align-items:baseline;
+        height: 100vh;
+        gap: 2rem;
+        input{
+            width: 50%;
+            outline: none;
+            height: 5vh;
+            border-radius: 3vh;
+            border: none;
+            padding: 0 1rem 0 1rem;
+            min-width: 5rem;
+        }
+        input::placeholder{
+           font-size: .9rem;
+        }
+        button{
+            height: 5vh;
+            padding: 1vh;
+            border-radius: 1rem;
+            outline: none;
+            border: none;
+            background: var(--gradient);
+            font-weight: 700;
+            cursor: pointer;
+            width: 6rem;
+            text-wrap: nowrap;
+        }
+        button:hover{
+            background: var(--gradient2);
+        }
+    }
+}
+
+@keyframes fadeInBackground {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }

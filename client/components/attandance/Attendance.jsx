@@ -1,0 +1,236 @@
+// AttendanceSheet.js
+
+import React, { useEffect, useState } from 'react';
+import style from'./attendance.module.scss'; // Import the CSS file for styling
+import { useDispatch, useSelector } from 'react-redux';
+import { dataActions, dataSelector } from '../../redux/reducers/dataReducer';
+import axios from 'axios';
+
+const Attendance = ({students,date}) => {
+  const dispatch = useDispatch();
+  const {dailyAttendance} = useSelector(dataSelector);
+  const [attendance, setAttendance] = useState([]);
+  const [classs, setClass] = useState("none");
+  
+  const month = date.getMonth();
+  const options = { month: 'long' };
+  const monthString = date.toLocaleString('en-US', options);
+  console.log(monthString)
+  const year = date.getFullYear();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const monthDays = [];
+  const today = date.getDate();
+  console.log(dailyAttendance);
+  for (let day = 1; day <= daysInMonth; day++) {
+    const currentDay = new Date(year, month, day);
+    const dayOfWeek = currentDay.toLocaleString('en-US', { weekday: 'long' });
+    monthDays.push({
+      dayOfWeek,
+      dayNumber: day,
+    });
+  }
+   
+  const settingClass = (e)=>{
+   setClass(e.target.value)
+  }
+
+  useEffect(() => {
+    if (dailyAttendance) {
+      const classAttendance = dailyAttendance?.[classs]?.[monthString];
+      if (classAttendance && Array.isArray(classAttendance) && classAttendance.length > 0) {
+        setAttendance(classAttendance[0]);
+      } else {
+        setAttendance();
+      }
+    }
+  }, [dailyAttendance, classs, monthString]);
+  
+  
+  
+  const handleRadioChange = (studentIndex, dayIndex, value) => {
+    
+    setAttendance((prevAttendance) => {
+      return {
+        ...prevAttendance,
+        [studentIndex]: {
+          ...prevAttendance?.[studentIndex],
+          [dayIndex]: value,
+        },
+      };
+    });
+  };
+  
+ 
+
+  const handlePayload = async ()=>{
+    dispatch(dataActions.ADD_ATTENDANCE({payload:attendance,month:monthString, classs:classs}))
+    try {
+      const config = {
+        headers:{
+          "Content-type":"application/json"
+        },
+      };
+     
+      const {data} = await axios.post("http://localhost:3000/schooldata",{
+        dailyAttendance
+      }, config);
+      console.log(data);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleCompare = (studentIndex, dayIndex, value, student) => {
+    let result = false;
+    
+    if (attendance && attendance[studentIndex]) {
+      const studentAttendance = attendance[studentIndex][dayIndex];
+      if (studentAttendance && studentAttendance.includes(value)) {
+        result = true;
+        console.log(result);
+      }
+    } else if (
+      dailyAttendance &&
+    dailyAttendance?.[classs] &&
+    dailyAttendance?.[classs]?.[monthString]
+  ) {
+    const classAttendance = dailyAttendance[classs][monthString];
+    
+    for (let i = 0; i < classAttendance.length; i++) {
+      if (
+        classAttendance[0] &&
+        classAttendance[0][studentIndex] &&
+        classAttendance[0][studentIndex][dayIndex] === value
+      ) {
+        result = true;
+        break; 
+      }
+    }
+  }
+  return result;
+  };
+  
+  
+  
+  
+  
+  
+  
+  return (
+    <>
+    <div className={style.attendanceSheet}>
+      <div className={style.boxButtonCont}>
+        <div>
+        <label htmlFor="classSelect">Choose a class:</label>
+        <select id="classSelect" className={style.select} name="classes" onChange={settingClass}>
+          <option value="none">None</option>
+          <option value="nursery">Nursery</option>
+          <option value="lkg">L.K.G</option>
+          <option value="ukg">U.K.G</option>
+          <option value="first">Ist</option>
+          <option value="second">2nd</option>
+          <option value="third">3rd</option>
+          <option value="fourth">4th</option>
+          <option value="fifth">5th</option>
+          <option value="sixth">6th</option>
+          <option value="seventh">7th</option>
+          <option value="eighth">8th</option>
+          <option value="nineth">9th</option>
+          <option value="tenth">10th</option>
+          <option value="eleventh">11th</option>
+          <option value="twelveth">12th</option>
+        </select>
+        </div>
+        {classs !== "none" && (
+          <>        
+        <div className={style.buttonSave} onClick={handlePayload}>SaveChanges</div>
+        <div style={{color:"white", fontWeight:"bold"}}>{`Attendance for : ${today}th ${ monthString}`}</div>
+        </>
+        )
+         }
+      </div>
+      {classs !== "none" && 
+      <table>
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            {monthDays.map(day => (
+              <th key={day.dayOfWeek +  day.dayNumber} style={day.dayNumber === today? {background:"cyan"}:{}}>
+                <div className={style.dayWeekPCont}>
+                  <div >{day.dayOfWeek } { day.dayNumber}</div>
+                  <div className={style.markCont} >
+                    <p style={{color:"green"}}>P</p>
+                    <p style={{color:"red"}}>A</p>
+                    <p style={{color:"blue"}}>L</p>
+                    <p style={{color:"black"}}>N</p>
+                  </div>
+                </div>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {students.map((student, studentIndex) => (
+            <tr key={studentIndex}>
+              <td className={style.studentName}>{student.name}</td>
+              {[...Array(daysInMonth).keys()].map((dayIndex,i) => (
+                <td key={i}>
+                  <div className={style.radioButtons}>
+                  <input
+                      className={style.attInput}
+                      type="radio"
+                      id={style.present}
+                      key={`${studentIndex}-${dayIndex}-present`}
+                      name={`attendance-${studentIndex}-${dayIndex}`}
+                      value="present"
+                      checked={handleCompare(studentIndex, dayIndex, 'present')}
+                      onChange={() => handleRadioChange(studentIndex, dayIndex, 'present')}
+                    />
+
+                    <input
+                      className={style.attInput}
+                      type="radio"
+                      id={style.absent}
+                      key={`${studentIndex}-${dayIndex}-absent`}
+                      name={`attendance-${studentIndex}-${dayIndex}`}
+                      value="absent"
+                      checked={handleCompare(studentIndex, dayIndex, 'absent',student)}
+                      onChange={() => handleRadioChange(studentIndex, dayIndex, 'absent')}
+                    />
+
+                    <input
+                      className={style.attInput}
+                      type="radio"
+                      id={style.leave}
+                      key={`${studentIndex}-${dayIndex}-leave`}
+                      name={`attendance-${studentIndex}-${dayIndex}`}
+                      value="leave"
+                      checked={handleCompare(studentIndex, dayIndex, 'leave')}
+                      onChange={() => handleRadioChange(studentIndex, dayIndex, 'leave')}
+                    />
+
+                    <input
+                      className={style.attInput}
+                      type="radio"
+                      id={style.none}
+                      key={`${studentIndex}-${dayIndex}-none`}
+                      name={`attendance-${studentIndex}-${dayIndex}`}
+                      value="none"
+                      checked={handleCompare(studentIndex, dayIndex, 'none')}
+                      onChange={() => handleRadioChange(studentIndex, dayIndex, 'none')}
+                    />
+                  </div>
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      }
+    </div>
+    </>
+    
+  );
+}        
+
+export default Attendance;
