@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import style from "./signup.module.scss"
 import axios from 'axios';
+import { Audio } from 'react-loader-spinner';
+import { Alert } from '@mui/material';
 
-const SignUp = ({navigateto}) => {
+const SignUp = ({setLoggedIn,setUser_id}) => {
 
 
   const [userData, setUserData] = useState({
@@ -14,6 +16,8 @@ const SignUp = ({navigateto}) => {
   });
  
   const [isDisabled, setIsdisabled] = useState(true);
+  const[loading,setLoading] = useState(false);
+  const[message, setMessage] = useState({severity:"",msg:""});
   const navigate = useNavigate();
 
 
@@ -45,13 +49,29 @@ const SignUp = ({navigateto}) => {
           "Content-type":"application/json"
         },
       };
-    
+      setLoading(true);
       const {data} = await axios.post("http://localhost:3000/register",{
         userData
       }, config);
       console.log(data);
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      setLoading(false);
+      setLoggedIn(true)
+      setUser_id(data._id);
+      setMessage((prevData)=>({
+        ...prevData,
+        severity:"success",
+        msg:"Logged in Successfully"
+      }));
+       navigate("/");
     } catch (error) {
       console.log(error)
+      setLoading(false);
+      setMessage((prevData)=>({
+        ...prevData,
+        severity:"error",
+        msg:error.response.data.message
+      }));
     }
 
     setUserData({
@@ -68,6 +88,20 @@ const SignUp = ({navigateto}) => {
   
       <div className={style.mainCont}>
         <div className={ style.cont} >
+        {loading &&
+        <Audio
+          height="80"
+          width="80"
+          radius="9"
+          color="green"
+          ariaLabel="loading"
+          wrapperStyle
+          wrapperClass
+       /> 
+      }
+      {message.msg !=="" &&
+        <Alert severity={message.severity}>{message.msg}</Alert>
+      }
 
             <input type="text"
              placeholder='Name' 

@@ -42,7 +42,7 @@ console.log("appData",classData);
         </>
         )}
         <Route path='/signin' element={<SignIn setLoggedIn={setLoggedIn} setUser_id={setUser_id}/>}/>
-        <Route path='/signup' element={<SignUp/>}/>
+        <Route path='/signup' element={<SignUp setLoggedIn={setLoggedIn} setUser_id={setUser_id}/>}/>
       </Routes>
     </BrowserRouter>
     </>

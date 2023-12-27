@@ -82,6 +82,7 @@ const Home = memo(({classData,setClassData, className, handleClick,loggedIn,user
       <div className={className?.class1 || style.homeMaincont}>
         <img src={img} alt="" />
         <div className={ className?.class2 || style.inputButton}>
+
           <input type="text" placeholder='Subject' value={inputValue.name} name="name"  onChange={handleOnchange}/> 
 
           <span><label htmlFor="classSelect"> Class:</label></span>
