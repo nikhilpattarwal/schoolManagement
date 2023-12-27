@@ -41,8 +41,28 @@
                 border: none;
                 padding: 1rem;
                 font-size: 1.2rem;
-                
             }
+             .labelSelect{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .select {
+                    outline: none;
+                    border: 1px solid hsl(0, 0%, 100%);
+                    padding:2px;
+                    font-size: 14px;
+                    cursor: pointer;
+                  }
+                  
+                  .select::after {
+                    content: '\25BC'; 
+                    position: absolute;
+                    top: 50%;
+                    right: 10px;
+                    transform: translateY(-50%);
+                  }
+             }
+            
             textarea{
                 width: 60%;
                 border: none;

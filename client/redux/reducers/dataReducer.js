@@ -12,8 +12,16 @@
         reducers:{
             ADD:(state, action)=>{
             const  type = action.payload.type;
+            console.log(type);
             const payload = action.payload.payload;
-            state[type] = [payload , ...state[type]]; 
+            console.log(payload);
+
+            if(!state[type][payload.grade]){
+                state[type][payload.grade] =[] 
+            }
+            state.students[payload.grade] = [payload , ...state.students[payload.grade]]; 
+
+            console.log(JSON.parse(JSON.stringify(state.students)));
             },
             ADD_ATTENDANCE:(state,action)=>{
                 const { classs, month, payload } = action.payload;
@@ -32,20 +40,26 @@
             },
             ADD_CLASSES:(state,action)=>{
                 console.log(action.payload);
-                const {classss} = action.payload;
-                if (!state.classes[classss]) {
-                    state.classes[classss] = [];
+                const {classss,id} = action.payload;
+                console.log("id",id,classss);
+
+                 const index = state.classes?.[classss]?.findIndex((cls) => cls.id === id);
+                 console.log(index);
+                 if(index === -1 ||  typeof index === "undefined"){
+                    if (!state.classes[classss]) {
+                        state.classes[classss] = [];
                     }
-                state.classes[classss] = [action.payload, ... state.classes[classss]];
-                console.log(JSON.parse(JSON.stringify(state.classes)));
-            }
+                     state.classes[classss] = [action.payload, ... state.classes[classss]];
+                     console.log(JSON.parse(JSON.stringify(state.classes)));
+                 }   
             },
             DELETE:(state,action)=>{
-
+                const {id,classss} = action.payload;
+                console.log("payload",id,classss);
+                state.classes[classss] = state.classes[classss].filter((cls) => cls.id !== id);
             },
-            UPDATE:(state,action)=>{
-                
-            }
+            },
+            
         }
     )
 

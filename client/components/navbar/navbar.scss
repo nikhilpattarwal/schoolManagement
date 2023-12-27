@@ -24,9 +24,14 @@
     .signup-in{
         display: flex;
         flex-direction: row;
-        align-items: baseline;
-        gap: 2rem;
+        align-items: center;
+        gap: .3rem;
         cursor: pointer;
+        
+        .logout-icon{
+            font-size: 1.5rem;
+            color: rgb(0, 0, 0);
+        }
            p{
             font-size: 1.2rem;
             font-weight: 700;

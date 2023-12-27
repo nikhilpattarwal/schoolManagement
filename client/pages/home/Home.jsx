@@ -1,19 +1,23 @@
 import React, { useState, memo, useEffect } from 'react'
 import img from "../../src//assets/homeimage.jpg"
 import style from "./home.module.scss"
-import { useDispatch, useSelector } from 'react-redux';
-import { dataActions, dataSelector } from '../../redux/reducers/dataReducer';
+import { useDispatch} from 'react-redux';
+import { dataActions} from '../../redux/reducers/dataReducer';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const Home = memo(({classData,setClassData, className}) => {
+const Home = memo(({classData,setClassData, className, handleClick,loggedIn,user_id}) => {
   
-
+// debugger;
   const [inputValue, setInputValue] = useState({ name: '', classss: 'none', id:''});
+  // console.log(inputValue)
   const dispatch = useDispatch();
-  const {classes} = useSelector(dataSelector);
   const uniqueId = uuidv4();
+  const navigate = useNavigate();
+
   const handleOnchange = (e) => {
+    // debugger;
     e.preventDefault();
     const name = e.target.name;
     const value = e.target.value;
@@ -21,28 +25,56 @@ const Home = memo(({classData,setClassData, className}) => {
     setInputValue((prevInputValue) => ({
       ...prevInputValue,
       [name]: value,
-      id:uniqueId
+      id:uniqueId,
+      user_id:user_id
     }));
   };
-
-  useEffect(()=>{
-  if(classData?.name && classData?.classss){
-    console.log("dispatchingitem");
-    dispatch(dataActions.ADD_CLASSES(classData));
-    setClassData("");
-    console.log("classData", classData);
+  
+  
+  const sendData = async()=>{
+    if(classData.length==0){
+      return;
+    }
+    try {
+      const config = {
+        headers:{
+          "Content-type":"application/json"
+        },
+      };
+      
+      const {data} = await  axios.post("http://localhost:3000/classes",{
+        classesData:classData
+      }, config);
+      console.log(data);
+    } catch (error) {
+      console.log(error)
+    }
   }
-  },[classData?.name, classData?.classss])
+  
+  useEffect(()=>{
+    
+    if( loggedIn && classData?.name && classData?.classss){
+      console.log("dispatchingitem");
+      sendData();
+      dispatch(dataActions.ADD_CLASSES(classData));
+      setClassData("");
+      console.log("classData", classData);
+    }
+    },[classData])
+ 
+  
+  
+  handleClick= () => {
+   
+    console.log("clickedHome button")
 
-  
-  
-  const handleClick = () => {
-    console.log("clicked button")
     if (inputValue.name.trim() !== "" && inputValue.classss !== "none") {
       setClassData(inputValue);
       setInputValue({ name: '', classss: 'none', id:'' });
     }
-    
+    if(!loggedIn){
+      navigate("/signin");
+    }
   };
 
   return (

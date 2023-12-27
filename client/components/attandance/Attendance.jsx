@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { dataActions, dataSelector } from '../../redux/reducers/dataReducer';
 import axios from 'axios';
 
-const Attendance = ({students,date}) => {
+const Attendance = ({date}) => {
   const dispatch = useDispatch();
   const {dailyAttendance} = useSelector(dataSelector);
   const [attendance, setAttendance] = useState([]);
@@ -15,12 +15,13 @@ const Attendance = ({students,date}) => {
   const month = date.getMonth();
   const options = { month: 'long' };
   const monthString = date.toLocaleString('en-US', options);
-  console.log(monthString)
+  // console.log(monthString)
   const year = date.getFullYear();
   const daysInMonth = new Date(year, month+1, 0).getDate();
+  console.log(daysInMonth)
   const monthDays = [];
   const today = date.getDate();
-  console.log(dailyAttendance);
+  // console.log(dailyAttendance);
   for (let day = 1; day <= daysInMonth; day++) {
     const currentDay = new Date(year, month, day);
     const dayOfWeek = currentDay.toLocaleString('en-US', { weekday: 'long' });
@@ -29,10 +30,34 @@ const Attendance = ({students,date}) => {
       dayNumber: day,
     });
   }
-   
+  
+  useEffect(()=>{
+    data();
+  },[classs])
+
+  let candidates;
+  let [students,setStudents] = useState();
+  const data = async () => {
+    try {
+      const {data} = await axios.get("http://localhost:3000/students");
+        candidates=  data[0]?.Students;
+       console.log(candidates);
+       setStudents(candidates?.[classs]);
+         console.log("students", students);
+         students && students.map((student)=>{
+          console.log(student)
+        })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  console.log(classs);
+  // console.log(candidates.nursery);
   const settingClass = (e)=>{
    setClass(e.target.value)
   }
+
+
 
   useEffect(() => {
     if (dailyAttendance) {
@@ -72,11 +97,11 @@ const Attendance = ({students,date}) => {
       };
      
       const {data} = await axios.post("http://localhost:3000/schooldata",{
-        dailyAttendance
+        data:attendance,month:monthString, classs:classs
       }, config);
-      console.log(data);
+      // console.log(data);
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
   }
 
@@ -87,7 +112,7 @@ const Attendance = ({students,date}) => {
       const studentAttendance = attendance[studentIndex][dayIndex];
       if (studentAttendance && studentAttendance.includes(value)) {
         result = true;
-        console.log(result);
+        // console.log(result);
       }
     } else if (
       dailyAttendance &&
@@ -109,11 +134,7 @@ const Attendance = ({students,date}) => {
   }
   return result;
   };
-  
-  
-  
-  
-  
+   
   
   
   return (
@@ -149,10 +170,10 @@ const Attendance = ({students,date}) => {
         )
          }
       </div>
-      {classs !== "none" && 
+      {classs !== "none" && students && students.length>0 && (
       <table>
         <thead>
-          <tr>
+          <tr className={style.dayMonthText}>
             <th>Student Name</th>
             {monthDays.map(day => (
               <th key={day.dayOfWeek +  day.dayNumber} style={day.dayNumber === today? {background:"cyan"}:{}}>
@@ -170,11 +191,13 @@ const Attendance = ({students,date}) => {
           </tr>
         </thead>
         <tbody>
-          {students.map((student, studentIndex) => (
+          {students && students.map((student, studentIndex) => (
             <tr key={studentIndex}>
+                {console.log(student)}
               <td className={style.studentName}>{student.name}</td>
               {[...Array(daysInMonth).keys()].map((dayIndex,i) => (
                 <td key={i}>
+                   {console.log(dayIndex)}
                   <div className={style.radioButtons}>
                   <input
                       className={style.attInput}
@@ -183,8 +206,8 @@ const Attendance = ({students,date}) => {
                       key={`${studentIndex}-${dayIndex}-present`}
                       name={`attendance-${studentIndex}-${dayIndex}`}
                       value="present"
-                      checked={handleCompare(studentIndex, dayIndex, 'present')}
-                      onChange={() => handleRadioChange(studentIndex, dayIndex, 'present')}
+                      checked={handleCompare(student.id, dayIndex +1, 'present')}
+                      onChange={() => handleRadioChange(student.id, dayIndex +1, 'present')}
                     />
 
                     <input
@@ -194,8 +217,8 @@ const Attendance = ({students,date}) => {
                       key={`${studentIndex}-${dayIndex}-absent`}
                       name={`attendance-${studentIndex}-${dayIndex}`}
                       value="absent"
-                      checked={handleCompare(studentIndex, dayIndex, 'absent',student)}
-                      onChange={() => handleRadioChange(studentIndex, dayIndex, 'absent')}
+                      checked={handleCompare(student.id, dayIndex +1, 'absent',student)}
+                      onChange={() => handleRadioChange(student.id, dayIndex +1, 'absent')}
                     />
 
                     <input
@@ -205,8 +228,8 @@ const Attendance = ({students,date}) => {
                       key={`${studentIndex}-${dayIndex}-leave`}
                       name={`attendance-${studentIndex}-${dayIndex}`}
                       value="leave"
-                      checked={handleCompare(studentIndex, dayIndex, 'leave')}
-                      onChange={() => handleRadioChange(studentIndex, dayIndex, 'leave')}
+                      checked={handleCompare(student.id, dayIndex +1, 'leave')}
+                      onChange={() => handleRadioChange(student.id, dayIndex +1, 'leave')}
                     />
 
                     <input
@@ -216,8 +239,8 @@ const Attendance = ({students,date}) => {
                       key={`${studentIndex}-${dayIndex}-none`}
                       name={`attendance-${studentIndex}-${dayIndex}`}
                       value="none"
-                      checked={handleCompare(studentIndex, dayIndex, 'none')}
-                      onChange={() => handleRadioChange(studentIndex, dayIndex, 'none')}
+                      checked={handleCompare(student.id, dayIndex +1, 'none')}
+                      onChange={() => handleRadioChange(student.id, dayIndex +1, 'none')}
                     />
                   </div>
                 </td>
@@ -226,6 +249,7 @@ const Attendance = ({students,date}) => {
           ))}
         </tbody>
       </table>
+      )
       }
     </div>
     </>

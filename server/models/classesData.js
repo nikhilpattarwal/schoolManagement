@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const classesSchema = mongoose.Schema(
     {
-    classes:{
+    classesData:{
        type: Object,
        required: true
    }
