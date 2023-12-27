@@ -85,7 +85,7 @@ const Home = memo(({classData,setClassData, className, handleClick,loggedIn,user
 
           <input type="text" placeholder='Subject' value={inputValue.name} name="name"  onChange={handleOnchange}/> 
 
-          <span><label htmlFor="classSelect"> Class:</label></span>
+          <span><label htmlFor="classSelect"> Class:</label>
           <span><select id="classSelect" className={style.select}  name="classss" value={inputValue.classss} onChange={handleOnchange}>
             <option value="none">None</option>
             <option value="nursery">Nursery</option>
@@ -103,7 +103,7 @@ const Home = memo(({classData,setClassData, className, handleClick,loggedIn,user
             <option value="tenth">10th</option>
             <option value="eleventh">11th</option>
             <option value="twelveth">12th</option>
-          </select></span>
+          </select></span></span>
           <button onClick={handleClick}>Create Class</button>
         </div>
       </div>

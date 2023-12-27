@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import "./navbar.scss";
 import { useNavigate } from 'react-router-dom';
 import { IoIosLogOut } from "react-icons/io";
+import { GiHamburgerMenu } from "react-icons/gi";
 
 const Navbar = ({loggedIn, setLoggedIn}) => {
     const navigate = useNavigate();
-
+     const [show, setShow] = useState(false);
     const handleClick = (link) => {
         navigate(link);
       };
@@ -16,11 +17,16 @@ const Navbar = ({loggedIn, setLoggedIn}) => {
         navigate("/signin");
       }
 
-      console.log("navBar loggedIn",loggedIn)
+      const handletoggle=()=>{
+        setShow((prev) => !prev);
+      }
 
   return (
     <>
       <div className="navCont">
+        <GiHamburgerMenu className="hamburger-icon" onClick={handletoggle}/>
+        
+          {!show && (
           <ul>
           <li onClick={()=>handleClick('/')}>Home</li>
         {loggedIn && (
@@ -31,6 +37,7 @@ const Navbar = ({loggedIn, setLoggedIn}) => {
           </>
           )}
         </ul>
+        )}
 
         {loggedIn?(
            <div className="signup-in" onClick={handleLogout}>
@@ -42,7 +49,6 @@ const Navbar = ({loggedIn, setLoggedIn}) => {
         <div className="signup-in" onClick={()=>handleClick('/signin')}>
             <p className='login'>Login</p>
         </div>)}
-        
       </div>   
     </>
   )
